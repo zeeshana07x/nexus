@@ -2,14 +2,21 @@ import { Navbar } from '@/components/Navbar';
 import { ProductGrid } from '@/components/ProductGrid';
 import { getProducts } from '@/lib/api';
 
+// Define proper types for Next.js 13+ page props
+interface PageProps {
+  params: { slug: string };
+  searchParams: { [key: string]: string | string[] | undefined };
+}
+
 export default async function CategoriesPage({
   searchParams,
-}: {
-  searchParams: { q?: string };
-}) {
+}: PageProps) {
   const initialProducts = await getProducts();
-  const searchQuery = searchParams.q?.toLowerCase() || '';
-  const filteredProducts = initialProducts.filter((product: { name: string; }) =>
+  const searchQuery = (
+    typeof searchParams.q === 'string' ? searchParams.q : ''
+  ).toLowerCase();
+
+  const filteredProducts = initialProducts.filter((product: { name: string }) =>
     product.name.toLowerCase().includes(searchQuery)
   );
 
