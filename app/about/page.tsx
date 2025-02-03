@@ -1,4 +1,4 @@
-import { Navbar } from '@/components/Navbar';
+import { Navbar } from "@/components/Navbar";
 
 export default function AboutPage() {
   return (
@@ -9,7 +9,7 @@ export default function AboutPage() {
           <h1 className="text-4xl font-bold text-gray-900 mb-8">About Nexus</h1>
           <div className="space-y-6 text-gray-600">
             <p>
-              At Nexus, we're passionate about bringing you the finest selection of modern
+              At Nexus, we&apos;re passionate about bringing you the finest selection of modern
               furniture and home decor. Founded in 2023, our mission is to help you
               create spaces that inspire and delight.
             </p>
@@ -19,8 +19,8 @@ export default function AboutPage() {
               sustainable materials, and timeless design.
             </p>
             <p>
-              Whether you're furnishing a new home or refreshing your current space,
-              we're here to help you find pieces that tell your unique story.
+              Whether you&apos;re furnishing a new home or refreshing your current space,
+              we&apos;re here to help you find pieces that tell your unique story.
             </p>
           </div>
         </div>

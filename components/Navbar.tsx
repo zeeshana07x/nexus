@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useEffect, FormEvent } from 'react';
-import { useRouter, usePathname, useSearchParams } from 'next/navigation';
-import Link from 'next/link';
-import { Search, ShoppingCart, Menu, X } from 'lucide-react';
+import { useState, useEffect, FormEvent, useCallback } from "react";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import Link from "next/link";
+import { Search, ShoppingCart, Menu, X } from "lucide-react";
 
 export function Navbar() {
   const router = useRouter();
@@ -12,40 +12,41 @@ export function Navbar() {
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
+  const [searchQuery, setSearchQuery] = useState(searchParams.get("q") || "");
 
-  // Function to handle search
-  const handleSearch = (e: FormEvent<HTMLFormElement> | string) => {
-    if (typeof e === 'string') {
-      // Handle direct string input
-      const params = new URLSearchParams(searchParams);
-      if (e.trim()) {
-        params.set('q', e.trim());
+  // Wrap handleSearch in useCallback
+  const handleSearch = useCallback(
+    (e: FormEvent<HTMLFormElement> | string) => {
+      if (typeof e === "string") {
+        const params = new URLSearchParams(searchParams.toString());
+        if (e.trim()) {
+          params.set("q", e.trim());
+        } else {
+          params.delete("q");
+        }
+        router.push(`${pathname}?${params.toString()}`);
       } else {
-        params.delete('q');
+        e.preventDefault();
+        const params = new URLSearchParams(searchParams.toString());
+        if (searchQuery.trim()) {
+          params.set("q", searchQuery.trim());
+        } else {
+          params.delete("q");
+        }
+        router.push(`${pathname}?${params.toString()}`);
       }
-      router.push(`${pathname}?${params.toString()}`);
-    } else {
-      // Handle form submission
-      e.preventDefault();
-      const params = new URLSearchParams(searchParams);
-      if (searchQuery.trim()) {
-        params.set('q', searchQuery.trim());
-      } else {
-        params.delete('q');
-      }
-      router.push(`${pathname}?${params.toString()}`);
-    }
-  };
+    },
+    [searchParams, router, pathname, searchQuery]
+  );
 
-  // Handle input change with debounce
+  // Now include handleSearch in the dependencies array
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
       handleSearch(searchQuery);
     }, 300);
 
     return () => clearTimeout(delayDebounceFn);
-  }, [searchQuery]);
+  }, [searchQuery, handleSearch]);
 
   // Close menu when route changes
   useEffect(() => {
@@ -53,13 +54,18 @@ export function Navbar() {
     setIsSearchOpen(false);
   }, [pathname]);
 
-  const NavLink = ({ href, children }: { href: string; children: React.ReactNode }) => (
+  const NavLink = ({
+    href,
+    children,
+  }: {
+    href: string;
+    children: React.ReactNode;
+  }) => (
     <Link
       href={href}
       className={`text-gray-600 hover:text-indigo-600 ${
-        pathname === href ? 'text-indigo-600 font-semibold' : ''
-      }`}
-    >
+        pathname === href ? "text-indigo-600 font-semibold" : ""
+      }`}>
       {children}
     </Link>
   );
@@ -94,7 +100,9 @@ export function Navbar() {
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
               <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
-              <button type="submit" className="sr-only">Search</button>
+              <button type="submit" className="sr-only">
+                Search
+              </button>
             </form>
             <button className="p-2 hover:bg-gray-100 rounded-full">
               <ShoppingCart className="w-6 h-6 text-gray-600" />
@@ -103,10 +111,9 @@ export function Navbar() {
 
           {/* Mobile Navigation Controls */}
           <div className="flex md:hidden items-center space-x-2">
-            <button 
+            <button
               onClick={() => setIsSearchOpen(!isSearchOpen)}
-              className="p-2 hover:bg-gray-100 rounded-full"
-            >
+              className="p-2 hover:bg-gray-100 rounded-full">
               <Search className="w-6 h-6 text-gray-600" />
             </button>
             <button className="p-2 hover:bg-gray-100 rounded-full">
@@ -114,8 +121,7 @@ export function Navbar() {
             </button>
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="p-2 hover:bg-gray-100 rounded-full"
-            >
+              className="p-2 hover:bg-gray-100 rounded-full">
               {isMenuOpen ? (
                 <X className="w-6 h-6 text-gray-600" />
               ) : (
@@ -137,7 +143,9 @@ export function Navbar() {
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
               <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
-              <button type="submit" className="sr-only">Search</button>
+              <button type="submit" className="sr-only">
+                Search
+              </button>
             </form>
           </div>
         )}
