@@ -2,19 +2,28 @@
 
 import { useState, useEffect, FormEvent, useCallback } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import { useCartStore } from "@/lib/cart-store";
 import Link from "next/link";
 import { Search, ShoppingCart, Menu, X } from "lucide-react";
 
 export function Navbar() {
+  // Declare hooks unconditionally
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
+  const [mounted, setMounted] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState(searchParams.get("q") || "");
+  const items = useCartStore((state) => state.items);
 
-  // Wrap handleSearch in useCallback
+  // Run useEffect to set mounted
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Now it's safe to use other hooks
   const handleSearch = useCallback(
     (e: FormEvent<HTMLFormElement> | string) => {
       if (typeof e === "string") {
@@ -39,7 +48,6 @@ export function Navbar() {
     [searchParams, router, pathname, searchQuery]
   );
 
-  // Now include handleSearch in the dependencies array
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
       handleSearch(searchQuery);
@@ -48,11 +56,13 @@ export function Navbar() {
     return () => clearTimeout(delayDebounceFn);
   }, [searchQuery, handleSearch]);
 
-  // Close menu when route changes
   useEffect(() => {
     setIsMenuOpen(false);
     setIsSearchOpen(false);
   }, [pathname]);
+
+  // Now perform the conditional return
+  if (!mounted) return null;
 
   const NavLink = ({
     href,
@@ -65,7 +75,8 @@ export function Navbar() {
       href={href}
       className={`text-gray-600 hover:text-indigo-600 ${
         pathname === href ? "text-indigo-600 font-semibold" : ""
-      }`}>
+      }`}
+    >
       {children}
     </Link>
   );
@@ -95,7 +106,7 @@ export function Navbar() {
               <input
                 type="text"
                 placeholder="Search..."
-                className="pl-10 pr-4 py-2 border rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="pl-10 pr-4 py-2 text-slate-700 border rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -104,24 +115,46 @@ export function Navbar() {
                 Search
               </button>
             </form>
-            <button className="p-2 hover:bg-gray-100 rounded-full">
+            {/* Updated Cart Button with visible text */}
+            <Link
+              href="/cart"
+              className="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded-full relative"
+            >
               <ShoppingCart className="w-6 h-6 text-gray-600" />
-            </button>
+              <span className="text-gray-600 font-medium">Cart</span>
+              {items.length > 0 && (
+                <span className="bg-indigo-600 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
+                  {items.length}
+                </span>
+              )}
+            </Link>
           </div>
 
           {/* Mobile Navigation Controls */}
           <div className="flex md:hidden items-center space-x-2">
             <button
               onClick={() => setIsSearchOpen(!isSearchOpen)}
-              className="p-2 hover:bg-gray-100 rounded-full">
+              className="p-2 hover:bg-gray-100 rounded-full"
+            >
               <Search className="w-6 h-6 text-gray-600" />
             </button>
-            <button className="p-2 hover:bg-gray-100 rounded-full">
+            {/* Updated Mobile Cart Button with visible text */}
+            <Link
+              href="/cart"
+              className="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded-full relative"
+            >
               <ShoppingCart className="w-6 h-6 text-gray-600" />
-            </button>
+              <span className="text-gray-600 font-medium">Cart</span>
+              {items.length > 0 && (
+                <span className="bg-indigo-600 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
+                  {items.length}
+                </span>
+              )}
+            </Link>
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="p-2 hover:bg-gray-100 rounded-full">
+              className="p-2 hover:bg-gray-100 rounded-full"
+            >
               {isMenuOpen ? (
                 <X className="w-6 h-6 text-gray-600" />
               ) : (
