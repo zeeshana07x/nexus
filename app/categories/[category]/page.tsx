@@ -1,30 +1,24 @@
-// [category]/page.tsx
-import { Navbar } from '@/components/Navbar';
-import { ProductGrid } from '@/components/ProductGrid';
-import { getProducts } from '@/lib/api';
-import { Product } from '@/types/product';
-
-interface PageProps {
-  params: {
-    category: string;
-  };
-  searchParams: {
-    q?: string;
-  };
-}
+import { Navbar } from "@/components/Navbar";
+import { ProductGrid } from "@/components/ProductGrid";
+import { getProducts } from "@/lib/api";
+import { Product } from "@/types/product";
 
 export default async function CategoryPage({
   params,
   searchParams,
-}: PageProps) {
+}: {
+  params: { category: string };
+  searchParams: { q?: string };
+}) {
   const initialProducts: Product[] = await getProducts();
-  const searchQuery = searchParams.q?.toLowerCase() ?? '';
-  const category = params.category.replace(/-/g, ' ');
+  const searchQuery = searchParams.q?.toLowerCase() ?? "";
+  const category = params.category.replace(/-/g, " ");
 
   // Filter products by category and search query
-  const filteredProducts = initialProducts.filter(product => {
+  const filteredProducts = initialProducts.filter((product) => {
     const matchesSearch = product.name.toLowerCase().includes(searchQuery);
-    const matchesCategory = product.category.toLowerCase() === category.toLowerCase(); // Added toLowerCase() for case-insensitive comparison
+    const matchesCategory =
+      product.category.toLowerCase() === category.toLowerCase();
     return matchesSearch && matchesCategory;
   });
 
@@ -43,9 +37,9 @@ export default async function CategoryPage({
 
 export async function generateStaticParams() {
   const products: Product[] = await getProducts();
-  const categories = Array.from(new Set(products.map(p => p.category)));
-  
-  return categories.map(category => ({
-    category: category.toLowerCase().replace(/\s+/g, '-'),
+  const categories = Array.from(new Set(products.map((p) => p.category)));
+
+  return categories.map((category) => ({
+    category: category.toLowerCase().replace(/\s+/g, "-"),
   }));
 }
