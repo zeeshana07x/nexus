@@ -1,7 +1,11 @@
+// categories/page.tsx
+import { Suspense } from "react";
 import { Navbar } from "@/components/Navbar";
 import { getProducts } from "@/lib/api";
 import Link from "next/link";
 import { Product } from "@/types/product";
+import { NavbarLoading } from "@/components/NavbarLoading";
+
 
 export default async function CategoriesPage() {
   const products: Product[] = await getProducts();
@@ -9,12 +13,11 @@ export default async function CategoriesPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar />
+      <Suspense fallback={<NavbarLoading />}>
+        <Navbar />
+      </Suspense>
       <main className="max-w-7xl mx-auto px-4 pt-24 pb-12">
-        {/* Main Header */}
-        <h1 className="text-4xl font-bold text-gray-900 mb-8">
-          All Categories
-        </h1>
+        <h1 className="text-4xl font-bold text-gray-900 mb-8">All Categories</h1>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {categories.map((category: string) => (
             <Link
