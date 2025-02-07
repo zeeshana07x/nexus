@@ -23,7 +23,7 @@ export function Navbar() {
     setMounted(true);
   }, []);
 
-  // Now it's safe to use other hooks
+  // safe to use other hooks
   const handleSearch = useCallback(
     (e: FormEvent<HTMLFormElement> | string) => {
       if (typeof e === "string") {
