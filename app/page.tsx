@@ -5,11 +5,20 @@ import { getProducts } from '@/lib/api';
 export default async function Home({
   searchParams,
 }: {
-  searchParams: { q?: string };
+  searchParams: { [key: string]: string | string[] | undefined };
 }) {
-  const initialProducts = await getProducts();
-  const searchQuery = searchParams.q?.toLowerCase() || '';
-  const filteredProducts = initialProducts.filter((product: { name: string; }) =>
+  // Wait for both searchParams and products
+  const [params, initialProducts] = await Promise.all([
+    searchParams,
+    getProducts()
+  ]);
+
+  // Now we can safely access the search query
+  const searchQuery = typeof params.q === 'string' 
+    ? params.q.toLowerCase() 
+    : '';
+
+  const filteredProducts = initialProducts.filter((product: { name: string }) =>
     product.name.toLowerCase().includes(searchQuery)
   );
 
